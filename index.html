@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>PatentOS — Patent portfolio management</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+ --ink:#161C2B; --paper:#F5F4EF; --surface:#FFFFFF; --line:#E2DFD3;
+ --brass:#9C6B22; --brass-ink:#FFFFFF; --brass-soft:#F1E6D2;
+ --emerald:#13614F; --ochre:#8A5A15; --rust:#8C2E22; --mute:#5C6270;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --ink:#ECE9E0; --paper:#0E1320; --surface:#161C2C; --line:#2B3448;
+ --brass:#D9A64E; --brass-ink:#0E1320; --brass-soft:#2A2211;
+ --emerald:#57C7A9; --ochre:#E0AE5C; --rust:#E08477; --mute:#93A0B5}}
+:root[data-theme="dark"]{
+ --ink:#ECE9E0; --paper:#0E1320; --surface:#161C2C; --line:#2B3448;
+ --brass:#D9A64E; --brass-ink:#0E1320; --brass-soft:#2A2211;
+ --emerald:#57C7A9; --ochre:#E0AE5C; --rust:#E08477; --mute:#93A0B5}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-family:"Source Serif 4",Georgia,serif;font-weight:600;letter-spacing:-.01em}
+h1{font-size:30px}h2{font-size:20px}h3{font-size:16px}
+.wrap{max-width:1060px;margin:0 auto;padding:18px 20px 60px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0 18px}
+.brand{display:flex;align-items:center;gap:9px;font-family:"Source Serif 4",serif;font-weight:600;font-size:19px}
+.brand svg{flex:none}
+.brand small{font-family:"IBM Plex Sans",sans-serif;font-weight:400;color:var(--mute);margin-left:6px;font-size:13px}
+nav{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:22px}
+nav button{background:none;border:0;border-bottom:2px solid transparent;padding:11px 14px;color:var(--mute);font:inherit;font-weight:500;cursor:pointer;white-space:nowrap;transition:color .15s}
+nav button.on{color:var(--ink);border-color:var(--brass)}
+nav button:hover{color:var(--ink)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:var(--brass-ink);border:0;border-radius:6px;padding:9px 16px;cursor:pointer;font-weight:600;letter-spacing:.01em;transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--brass)}
+.btn.sm{padding:5px 11px;font-size:13px;border-radius:5px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:18px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.stat{border-top:2px solid var(--brass);border-radius:4px 4px 9px 9px}
+.stat b{display:block;font-family:"Source Serif 4",serif;font-size:32px;font-weight:600;line-height:1.1}
+.stat span{color:var(--mute);font-size:13px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--mute);font-size:12.5px;padding:9px 10px;border-bottom:1px solid var(--line)}
+td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb, var(--brass) 5%, transparent)}
+.sub{color:var(--mute);font-size:12.5px;display:block;margin-top:2px}
+.pill{display:inline-block;border-radius:99px;padding:2px 11px;font-size:12px;font-weight:600}
+.pill.ok{color:var(--emerald);background:color-mix(in srgb, var(--emerald) 14%, transparent)}
+.pill.warn{color:var(--ochre);background:color-mix(in srgb, var(--ochre) 16%, transparent)}
+.pill.mid{color:var(--mute);background:color-mix(in srgb, var(--mute) 12%, transparent)}
+.ok{color:var(--emerald)}.warn{color:var(--ochre)}.bad{color:var(--rust)}.mu{color:var(--mute)}
+.empty{text-align:center;padding:34px 16px;color:var(--mute)}
+.linklike{background:none;border:0;padding:0;color:var(--brass);font:inherit;font-weight:500;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.linklike:hover{filter:brightness(1.15)}
+label{display:block;font-size:13px;color:var(--mute);margin:11px 0 4px}
+input,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+input[type=checkbox]{width:auto;margin-right:8px}
+.chk{display:flex;align-items:center;margin:7px 0;color:var(--ink);font-size:14px}
+dialog{border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);width:min(460px,92vw);padding:22px}
+dialog::backdrop{background:rgba(10,12,18,.55)}
+.choice{display:grid;gap:12px;margin-top:20px}
+.choice button{display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:16px;cursor:pointer;transition:border-color .15s,background .15s}
+.choice button:hover{border-color:var(--brass);background:color-mix(in srgb, var(--brass) 4%, var(--surface))}
+.choice svg{flex:none;margin-top:2px}
+.choice b{display:block;font-family:"Source Serif 4",serif;font-size:17px;font-weight:600}
+.choice span{color:var(--mute);font-size:13.5px}
+.gate{max-width:460px;margin:9vh auto 0}
+.gate .mark{margin-bottom:22px}
+.note{font-size:13px;color:var(--mute);margin-top:12px}
+</style></head><body><div class="wrap" id="app"></div>
+<dialog id="dlg"><form method="dialog" id="frm"></form></dialog>
+<script>
+const KEY='patentos_v2';
+let S={user:null,patents:[],deadlines:[],invoices:[],documents:[],rem:{days:[90,60,30,15,7],who:['Responsible counsel','Company IP manager']}};
+let tab='dash', detailId=null;
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const isC=()=>S.user&&S.user.type==='counsel';
+const PT=()=>isC()?'Client':'Responsible counsel';
+const STEPS=['Entered','Date verified','Payment authorised','Payment submitted','Payment verified'];
+const NEXT=['Verify date','Authorise payment','Mark submitted','Verify payment'];
+const CATS=['Filing','Drafting','Prosecution','Grant','Annuities','Other'];
+const days=d=>Math.ceil((new Date(d)-new Date(new Date().toDateString()))/864e5);
+const pat=id=>S.patents.find(p=>p.id===id);
+const pname=id=>{const p=pat(id);return p?`${esc(p.title)}<span class="sub">${esc(p.country)} · ${esc(p.party||'—')}</span>`:'—'};
+const COUNTRIES=['India','United States','Europe (EPO)','Japan','China','Germany','Other'];
+const STAGES=['Filed','Published','Under examination','Granted','Lapsed'];
+const DOCTYPES=['Filing receipt','Office action','Response filed','Grant certificate','Assignment','Invoice or payment proof','Other'];
+function chartH(data){
+ if(!data.length)return '<p class="mu">No invoices yet.</p>';
+ const mx=Math.max(1,...data.map(d=>d[1])), rowH=26, gap=8, padL=148, padR=90, w=620;
+ const h=data.length*(rowH+gap);
+ const rows=data.map((d,i)=>{const y=i*(rowH+gap), bw=Math.max(3,(w-padL-padR)*(d[1]/mx));
+  return `<text x="0" y="${y+rowH/2+4}" font-size="12.5" style="fill:var(--ink)">${esc(String(d[0]).slice(0,20))}</text>
+  <rect x="${padL}" y="${y}" width="${bw}" height="${rowH}" rx="4" style="fill:var(--brass)"/>
+  <text x="${padL+bw+8}" y="${y+rowH/2+4}" font-size="12.5" font-weight="600" style="fill:var(--ink)">${inr(d[1])}</text>`}).join('');
+ return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="max-width:620px;display:block;font-family:'IBM Plex Sans',sans-serif">${rows}</svg>`;
+}
+const SEAL=`<svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="currentColor" stroke-width="1.6"/><circle cx="13" cy="13" r="6.2" stroke="currentColor" stroke-width="1.6"/><path d="M13 6.8v1.6M13 17.6v1.6M6.8 13h1.6M17.6 13h1.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const ICO_CO=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M9 8V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>`;
+const ICO_FIRM=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v2M4 8h16M6 8l-2 5a3 3 0 0 0 6 0l-2-5M18 8l-2 5a3 3 0 0 0 6 0l-2-5"/><path d="M12 5v14M7 21h10"/></svg>`;
+
+function gate(){
+ $('#app').innerHTML=`<div class="gate"><div class="mark" style="color:var(--brass)">${SEAL}</div>
+ <h1>File once. Never miss a renewal.</h1><p class="mu" style="margin-top:8px">Patent lifecycle, verified deadlines and portfolio spend, in one register.</p>
+ <div class="card" style="margin-top:22px" id="g1"><label for="em">Your email</label><input id="em" type="email" autocomplete="email" placeholder="you@example.com">
+ <p class="bad" id="er" style="font-size:13px;margin:6px 0 0"></p><div style="margin-top:16px"><button class="btn" id="go">Continue</button></div></div></div>`;
+ $('#go').onclick=()=>{const v=$('#em').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){$('#er').textContent='Enter a valid email address, like name@company.com.';return}
+  $('#g1').innerHTML=`<h2>Which describes you?</h2><p class="mu" style="margin:6px 0 0">Signed in as ${esc(v)}</p>
+  <div class="choice"><button data-t="company"><span style="color:var(--brass)">${ICO_CO}</span><span><b>A company</b><span>You want to manage your own IP portfolio &mdash; your patents, deadlines and spend.</span></span></button>
+  <button data-t="counsel"><span style="color:var(--brass)">${ICO_FIRM}</span><span><b>A firm or patent agent</b><span>You manage patent portfolios for multiple clients, with deadlines and billing per client.</span></span></button></div>`;
+  document.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{S.user={email:v,type:b.dataset.t};save();render()})};
+ $('#em').onkeydown=e=>{if(e.key==='Enter')$('#go').click()};
+}
+
+function render(){
+ if(!S.user)return gate();
+ const tabs=[['dash','Dashboard'],['pat','Patents'],['dl','Deadlines'],['inv','Invoices'],['party',isC()?'By client':'By counsel'],['rem','Reminders']];
+ $('#app').innerHTML=`<div class="top"><div class="brand"><span style="color:var(--brass)">${SEAL}</span>PatentOS<small>${isC()?'Counsel':'Company'} account &middot; ${esc(S.user.email)}</small></div><div style="display:flex;gap:8px"><button class="btn ghost sm" id="reset">Reset data</button><button class="btn ghost sm" id="out">Sign out</button></div></div>
+ <nav>${tabs.map(t=>`<button class="${tab===t[0]&&!detailId?'on':''}" data-t="${t[0]}">${t[1]}</button>`).join('')}</nav><main>${detailId?patentDetail(detailId):views[tab]()}</main>`;
+ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;detailId=null;render()});
+ $('#out').onclick=()=>{S.user=null;save();render()};
+ $('#reset').onclick=()=>{if(confirm('This clears every patent, deadline and invoice you have entered, on this device. Continue?')){const u=S.user;S={user:u,patents:[],deadlines:[],invoices:[],rem:{days:[90,60,30,15,7],who:['Responsible counsel','Company IP manager']}};save();render()}};
+ bind();
+}
+
+const views={
+dash(){
+ const open=S.deadlines.filter(d=>d.step<4), soon=open.filter(d=>days(d.due)<=90).sort((a,b)=>a.due>b.due?1:-1);
+ const inv=S.invoices, tot=inv.reduce((s,i)=>s+i.amt*i.rate,0), paid=inv.filter(i=>i.paid).reduce((s,i)=>s+i.amt*i.rate,0);
+ const grp=f=>{const m={};inv.forEach(i=>{const k=f(i);m[k]=(m[k]||0)+i.amt*i.rate});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+ return `<div class="grid g4"><div class="card stat"><b>${S.patents.length}</b><span>Patent records</span></div>
+ <div class="card stat"><b>${open.length}</b><span>Open deadlines</span></div>
+ <div class="card stat"><b class="${soon.length?'warn':''}">${soon.length}</b><span>Due within 90 days</span></div>
+ <div class="card stat"><b>${inr(tot)}</b><span>Invoiced, ${inr(paid)} paid</span></div></div>
+ ${S.patents.length?'':`<div class="card empty" style="margin-top:14px"><p>Your portfolio is empty. Start by adding your first patent.</p><button class="btn" id="goAddP">Add patent</button></div>`}
+ <div class="card" style="margin-top:14px"><h2 style="margin-bottom:10px;font-size:17px">Upcoming deadlines</h2>${soon.length?`<div class="scroll"><table><tr><th>Patent</th><th>Action</th><th>Due</th><th>Status</th></tr>${soon.slice(0,6).map(d=>`<tr><td>${pname(d.pid)}</td><td>${esc(d.action)}</td><td>${fd(d.due)}</td><td>${st(d)}</td></tr>`).join('')}</table></div>`:'<p class="mu">No open deadlines in the next 90 days.</p>'}</div>
+ <div class="grid g2" style="margin-top:14px"><div class="card"><h2 style="font-size:16px">Spend by category</h2>${chartH(grp(i=>i.cat))}</div>
+ <div class="card"><h2 style="font-size:16px">Spend by ${isC()?'client':'counsel'}</h2>${chartH(grp(i=>(pat(i.pid)||{}).party||'Unassigned'))}</div></div>
+ <div class="card" style="margin-top:14px"><h2 style="font-size:16px">Spend by patent</h2>${chartH(grp(i=>(pat(i.pid)||{}).title||'Unassigned'))}</div>`},
+pat(){
+ return `<div class="row"><h2>Patents</h2><button class="btn" id="addP">Add patent</button></div><div class="card scroll">${S.patents.length?`<table><tr><th>Title</th><th>Family ref</th><th>Country</th><th>Application no.</th><th>${PT()}</th><th>Stage</th></tr>${S.patents.map(p=>`<tr><td><button class="linklike" data-view="${p.id}">${esc(p.title)}</button></td><td>${esc(p.ref)}</td><td>${esc(p.country)}</td><td>${esc(p.appNo||'—')}</td><td>${esc(p.party||'—')}</td><td>${esc(p.stage)}</td></tr>`).join('')}</table>`:'<p class="empty">No patents yet. Add one country record per application, and reuse the family reference to group them.</p>'}</div>
+ <p class="note">Click a patent's title to open its record, change its stage, add documents and see its costs.</p>`},
+dl(){
+ const L=[...S.deadlines].sort((a,b)=>a.due>b.due?1:-1);
+ return `<div class="row"><h2>Deadlines and annuities</h2><button class="btn" id="addD">Add deadline</button></div><div class="card scroll">${L.length?`<table><tr><th>Patent</th><th>Action</th><th>Due</th><th>Status</th><th></th></tr>${L.map(d=>{const n=days(d.due);return `<tr><td>${pname(d.pid)}</td><td>${esc(d.action)}<span class="sub">Source: ${esc(d.src||'not recorded')}</span></td><td>${fd(d.due)}<span class="sub ${d.step<4&&n<0?'bad':n<=30?'warn':''}">${d.step>=4?'Closed':n<0?Math.abs(n)+' days overdue':n+' days left'}</span></td><td>${st(d)}</td><td>${d.step<4?`<button class="btn sm ghost" data-adv="${d.id}">${NEXT[d.step]}</button>`:''}</td></tr>`}).join('')}</table>`:'<p class="empty">No deadlines yet. Enter each due date manually and note where it came from.</p>'}</div>
+ <p class="note">Reminders only apply once the date is verified. A second authorised user should do the verification. An invoice never marks an annuity as paid.</p>`},
+inv(){
+ return `<div class="row"><h2>Invoices and costs</h2><button class="btn" id="addI">Add invoice</button></div><div class="card scroll">${S.invoices.length?`<table><tr><th>Patent</th><th>Vendor</th><th>Category</th><th>Original</th><th>In INR</th><th>Payment</th></tr>${S.invoices.map(i=>`<tr><td>${pname(i.pid)}</td><td>${esc(i.vendor)}<span class="sub">${esc(i.no||'')} ${i.date?'· '+fd(i.date):''}</span></td><td>${esc(i.cat)}</td><td>${esc(i.cur)} ${Number(i.amt).toLocaleString()}<span class="sub">rate ${i.rate}</span></td><td>${inr(i.amt*i.rate)}</td><td><button class="btn ghost sm" data-paid="${i.id}">${i.paid?'<span class="ok">Paid</span>':'<span class="warn">Invoiced</span>'}</button></td></tr>`).join('')}</table>`:'<p class="empty">No invoices yet. Add costs manually; the original currency and conversion rate are kept.</p>'}</div>
+ <p class="note">Invoiced and paid are tracked separately. Select the status to switch it.</p>`},
+rem(){
+ const D=[120,90,60,30,15,7,1],W=['Responsible counsel','Company IP manager','Finance department','Secondary deadline reviewer'];
+ return `<h2 style="margin-bottom:14px">Reminder settings</h2><div class="grid g2"><div class="card"><h3>Send reminders before the due date</h3>${D.map(d=>`<label class="chk"><input type="checkbox" data-d="${d}" ${S.rem.days.includes(d)?'checked':''}>${d} days before</label>`).join('')}</div>
+ <div class="card"><h3>Recipients</h3>${W.map(w=>`<label class="chk"><input type="checkbox" data-w="${w}" ${S.rem.who.includes(w)?'checked':''}>${w}</label>`).join('')}</div></div>
+ <div class="card" style="margin-top:14px"><h3>Preview</h3><p class="mu" style="margin:8px 0 0">Reminders: ${[...S.rem.days].sort((a,b)=>b-a).join(', ')||'none'} days before each verified deadline. Recipients: ${S.rem.who.length} selected.</p>
+ <p class="note">This prototype stores your settings but does not send email yet. Sending needs a backend service, the next build step.</p></div>`},
+party(){
+ const label=isC()?'client':'counsel';
+ const grp={};
+ S.invoices.forEach(i=>{const p=pat(i.pid),k=(p&&p.party)||'Unassigned';(grp[k]=grp[k]||{tot:0,ids:new Set()}).tot+=i.amt*i.rate;grp[k].ids.add(i.pid)});
+ S.patents.forEach(p=>{const k=p.party||'Unassigned';grp[k]=grp[k]||{tot:0,ids:new Set()};grp[k].ids.add(p.id)});
+ const entries=Object.entries(grp).sort((a,b)=>b[1].tot-a[1].tot);
+ return `<h2 style="margin-bottom:14px">Spend by ${label}</h2>
+ <div class="card">${chartH(entries.map(([k,v])=>[k,v.tot]))}</div>
+ <div class="grid g2" style="margin-top:14px">${entries.length?entries.map(([k,v])=>{const pts=[...v.ids].map(pat).filter(Boolean);
+  return `<div class="card"><h3>${esc(k)}</h3><p class="mu" style="margin:4px 0 12px">${inr(v.tot)} across ${pts.length} patent${pts.length===1?'':'s'}</p>
+  <table><tr><th>Patent</th><th>Country</th><th>Stage</th></tr>${pts.map(p=>`<tr><td><button class="linklike" data-view="${p.id}">${esc(p.title)}</button></td><td>${esc(p.country)}</td><td>${esc(p.stage)}</td></tr>`).join('')}</table></div>`}).join(''):`<div class="card empty"><p>No ${label}s recorded yet. They appear here once you add a patent or invoice with a ${label} name.</p></div>`}</div>`}
+};
+const fd=d=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const st=d=>`<span class="pill ${d.step>=4?'ok':d.step>=1?'mid':'warn'}">${STEPS[d.step]}</span>`;
+
+function patentDetail(id){
+ const p=pat(id);
+ if(!p){detailId=null;return views.pat()}
+ const pd=S.deadlines.filter(d=>d.pid===id).sort((a,b)=>a.due>b.due?1:-1);
+ const pi=S.invoices.filter(i=>i.pid===id);
+ const docs=S.documents.filter(x=>x.pid===id).sort((a,b)=>a.date<b.date?1:-1);
+ const tot=pi.reduce((s,i)=>s+i.amt*i.rate,0), paidT=pi.filter(i=>i.paid).reduce((s,i)=>s+i.amt*i.rate,0);
+ const catGrp={};pi.forEach(i=>{catGrp[i.cat]=(catGrp[i.cat]||0)+i.amt*i.rate});
+ const chartData=Object.entries(catGrp).sort((a,b)=>b[1]-a[1]);
+ return `<button class="btn ghost sm" id="backP">&larr; Back to patents</button>
+ <div class="row" style="margin-top:14px"><div><h2>${esc(p.title)}</h2><p class="mu" style="margin-top:4px">${esc(p.ref)} &middot; ${esc(p.country)} &middot; App. ${esc(p.appNo||'not recorded')} &middot; ${esc(PT())}: ${esc(p.party||'not recorded')}</p></div>
+ <button class="btn ghost sm" id="editP">Edit details</button></div>
+ <div class="grid g4" style="margin-top:4px">
+ <div class="card stat"><b>${inr(tot)}</b><span>Total invoiced</span></div>
+ <div class="card stat"><b>${inr(paidT)}</b><span>Paid to date</span></div>
+ <div class="card stat"><b>${pd.length}</b><span>Deadlines on record</span></div>
+ <div class="card"><label style="margin:0 0 6px">Stage</label><select id="quickStage">${STAGES.map(s=>`<option ${s===p.stage?'selected':''}>${esc(s)}</option>`).join('')}</select></div></div>
+ <div class="card" style="margin-top:14px"><h3 style="margin-bottom:8px">Cost by category</h3>${chartH(chartData)}</div>
+ <div class="row" style="margin-top:14px"><h3>Deadlines</h3><button class="btn sm" id="addDp">Add deadline</button></div>
+ <div class="card scroll">${pd.length?`<table><tr><th>Action</th><th>Due</th><th>Status</th></tr>${pd.map(d=>`<tr><td>${esc(d.action)}</td><td>${fd(d.due)}</td><td>${st(d)}</td></tr>`).join('')}</table>`:'<p class="empty">No deadlines recorded for this patent yet.</p>'}</div>
+ <div class="row" style="margin-top:14px"><h3>Invoices</h3><button class="btn sm" id="addIp">Add invoice</button></div>
+ <div class="card scroll">${pi.length?`<table><tr><th>Vendor</th><th>Category</th><th>Amount</th><th>Payment</th></tr>${pi.map(i=>`<tr><td>${esc(i.vendor)}</td><td>${esc(i.cat)}</td><td>${inr(i.amt*i.rate)}</td><td>${i.paid?'<span class="ok">Paid</span>':'<span class="warn">Invoiced</span>'}</td></tr>`).join('')}</table>`:'<p class="empty">No invoices recorded for this patent yet.</p>'}</div>
+ <div class="row" style="margin-top:14px"><h3>Documents</h3><button class="btn sm" id="addDoc">Add document</button></div>
+ <div class="card scroll">${docs.length?`<table><tr><th>Document</th><th>Type</th><th>Added</th><th></th></tr>${docs.map(x=>`<tr><td>${esc(x.name)}${x.note?`<span class="sub">${esc(x.note)}</span>`:''}</td><td>${esc(x.cat)}</td><td>${fd(x.date)}</td><td>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="color:var(--brass)">Open</a>`:''}</td></tr>`).join('')}</table>`:'<p class="empty">No documents added yet. Store the file in Drive or Dropbox and paste the link here.</p>'}</div>`;
+}
+
+function form(title,fields,onOk){
+ $('#frm').innerHTML=`<h2>${title}</h2>${fields.map(f=>f.type==='check'?`<label class="chk"><input type="checkbox" name="${f.k}" ${f.v?'checked':''}>${f.l}</label>`:`<label for="f_${f.k}">${f.l}</label>${f.opts?`<select id="f_${f.k}" name="${f.k}">${f.opts.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(f.v)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`:`<input id="f_${f.k}" name="${f.k}" type="${f.type||'text'}" ${f.req?'required':''} value="${esc(f.v||'')}" ${f.step?'step="any"':''}>`}`).join('')}
+ <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end"><button type="button" class="btn ghost" id="cx">Cancel</button><button class="btn" value="ok">Save</button></div>`;
+ const dlg=$('#dlg');$('#cx').onclick=()=>dlg.close();
+ $('#frm').onsubmit=e=>{const fm=new FormData($('#frm')),o={};fields.forEach(f=>o[f.k]=f.type==='check'?fm.has(f.k):fm.get(f.k));onOk(o);save();render()};
+ dlg.showModal();
+}
+const popts=()=>S.patents.map(p=>[p.id,p.title+' ('+p.country+')']);
+function bind(){
+ const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+ on('#goAddP',()=>{tab='pat';render();setTimeout(()=>$('#addP')&&$('#addP').click(),0)});
+ on('#addP',()=>form('Add patent',[{k:'title',l:'Invention title',req:1},{k:'ref',l:'Family reference (e.g. PAT-001)',req:1},{k:'country',l:'Country or region',opts:COUNTRIES.map(x=>[x,x])},{k:'appNo',l:'Application number'},{k:'party',l:PT()},{k:'stage',l:'Stage',opts:STAGES.map(x=>[x,x])}],o=>S.patents.push({id:uid(),...o})));
+ on('#addD',()=>{if(!S.patents.length)return alert('Add a patent first.');form('Add deadline',[{k:'pid',l:'Patent',opts:popts()},{k:'action',l:'Action (e.g. Year 4 renewal)',req:1},{k:'due',l:'Verified due date',type:'date',req:1},{k:'src',l:'Source of date (e.g. counsel docket)'}],o=>S.deadlines.push({id:uid(),step:0,...o}))});
+ on('#addI',()=>{if(!S.patents.length)return alert('Add a patent first.');form('Add invoice',[{k:'pid',l:'Patent',opts:popts()},{k:'vendor',l:'Vendor or counsel',req:1},{k:'no',l:'Invoice number'},{k:'cat',l:'Category',opts:CATS.map(x=>[x,x])},{k:'cur',l:'Currency',opts:['INR','USD','EUR','GBP','JPY'].map(x=>[x,x])},{k:'amt',l:'Amount (original currency)',type:'number',step:1,req:1},{k:'rate',l:'Rate to INR (1 for INR)',type:'number',step:1,v:'1',req:1},{k:'date',l:'Invoice date',type:'date'},{k:'paid',l:'Already paid',type:'check'}],o=>S.invoices.push({id:uid(),...o,amt:+o.amt,rate:+o.rate}))});
+ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{detailId=b.dataset.view;tab='pat';render()});
+ on('#backP',()=>{detailId=null;render()});
+ on('#editP',()=>{const p=pat(detailId);form('Edit patent',[{k:'title',l:'Invention title',req:1,v:p.title},{k:'ref',l:'Family reference (e.g. PAT-001)',req:1,v:p.ref},{k:'country',l:'Country or region',opts:COUNTRIES.map(x=>[x,x]),v:p.country},{k:'appNo',l:'Application number',v:p.appNo},{k:'party',l:PT(),v:p.party},{k:'stage',l:'Stage',opts:STAGES.map(x=>[x,x]),v:p.stage}],o=>Object.assign(p,o))});
+ const qs=$('#quickStage');if(qs)qs.onchange=()=>{pat(detailId).stage=qs.value;save();render()};
+ on('#addDp',()=>form('Add deadline',[{k:'action',l:'Action (e.g. Year 4 renewal)',req:1},{k:'due',l:'Verified due date',type:'date',req:1},{k:'src',l:'Source of date (e.g. counsel docket)'}],o=>S.deadlines.push({id:uid(),step:0,pid:detailId,...o})));
+ on('#addIp',()=>form('Add invoice',[{k:'vendor',l:'Vendor or counsel',req:1},{k:'no',l:'Invoice number'},{k:'cat',l:'Category',opts:CATS.map(x=>[x,x])},{k:'cur',l:'Currency',opts:['INR','USD','EUR','GBP','JPY'].map(x=>[x,x])},{k:'amt',l:'Amount (original currency)',type:'number',step:1,req:1},{k:'rate',l:'Rate to INR (1 for INR)',type:'number',step:1,v:'1',req:1},{k:'date',l:'Invoice date',type:'date'},{k:'paid',l:'Already paid',type:'check'}],o=>S.invoices.push({id:uid(),pid:detailId,...o,amt:+o.amt,rate:+o.rate})));
+ on('#addDoc',()=>form('Add document',[{k:'name',l:'Document name',req:1},{k:'cat',l:'Type',opts:DOCTYPES.map(x=>[x,x])},{k:'url',l:'Link (Drive, Dropbox, etc.) — optional'},{k:'note',l:'Note — optional'}],o=>S.documents.push({id:uid(),pid:detailId,date:new Date().toISOString().slice(0,10),...o})));
+ document.querySelectorAll('[data-adv]').forEach(b=>b.onclick=()=>{S.deadlines.find(d=>d.id===b.dataset.adv).step++;save();render()});
+ document.querySelectorAll('[data-paid]').forEach(b=>b.onclick=()=>{const i=S.invoices.find(x=>x.id===b.dataset.paid);i.paid=!i.paid;save();render()});
+ document.querySelectorAll('[data-d]').forEach(c=>c.onchange=()=>{const n=+c.dataset.d;S.rem.days=c.checked?[...S.rem.days,n]:S.rem.days.filter(x=>x!==n);save();render()});
+ document.querySelectorAll('[data-w]').forEach(c=>c.onchange=()=>{const n=c.dataset.w;S.rem.who=c.checked?[...S.rem.who,n]:S.rem.who.filter(x=>x!==n);save();render()});
+}
+render();
+</script></body></html>
